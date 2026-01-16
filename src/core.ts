@@ -7,7 +7,9 @@ import {
   getHashKeys,
   getKey,
   getKeys,
+  getKeysLength,
   getListKeys,
+  getListKeysLength,
   hgetAll,
   removeFromList,
   setKey,
@@ -68,8 +70,8 @@ const commandsHandler = {
 
     return await hgetAll(hkey);
   },
-  KEYS: () => getKeys(),
-  HKEYS: () => getHashKeys(),
+  KEYS: getKeys,
+  HKEYS: getHashKeys,
   FETCH: async (args: string[]) => {
     const [lkey] = args;
     if (!lkey) throw new Error();
@@ -92,7 +94,13 @@ const commandsHandler = {
 
     return !!(await delListKey(lkey));
   },
-  LKEYS: () => getListKeys(),
+  LKEYS: getListKeys,
+  LEN: async (args: string[]) => {
+    const [lkey] = args;
+    if (!lkey) throw new Error();
+    return await getListKeysLength(lkey);
+  },
+  COUNT: getKeysLength,
 };
 
 export const executeCommand = (

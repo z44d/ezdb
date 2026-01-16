@@ -186,3 +186,19 @@ export const delExpired = async () =>
       .limit(1000)
       .returning({ key: baseTable.key })
   ).length;
+
+export const getKeysLength = async () => await db.$count(baseTable);
+
+export const getListKeysLength = async (listName: string) =>
+  (
+    await db
+      .select({ key: baseTable.key })
+      .from(baseTable)
+      .where(
+        and(
+          notExpired(),
+          eq(baseTable.key, listName),
+          eq(baseTable.type, "set"),
+        ),
+      )
+  ).length;
