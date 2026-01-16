@@ -1,113 +1,78 @@
 # EzDB
 
-EzDB is a lightweight, Redis-compatible key-value store powered by **Bun** and backed by **SQLite** (via Drizzle ORM). It provides a familiar TCP interface for caching and storage while offering the simplicity and persistence of a local SQLite database.
-
-## Features
-
-- **Redis-compatible Protocol**: Connect using standard Redis clients or the built-in CLI.
-- **SQLite Backend**: Data is persisted reliably in a local SQLite database (`local.db`).
-- **TTL Support**: Built-in specialized handling for key expiration.
-- **Data Types**: Supports Strings, Hashes, and Sets.
-- **Built with Modern Tech**: Bun, TypeScript, Drizzle ORM, and Biome.
+EzDB is a lightweight key-value store powered by **Bun** and backed by **SQLite**.
 
 ## Prerequisites
 
-- [Bun](https://bun.sh) (latest version recommended)
-
-## Installation
-
-Clone the repository and install dependencies:
-
-```bash
-bun install
-```
+- [Bun](https://bun.sh) (latest version)
 
 ## Setup
 
-Initialize the database (generates schema and runs migrations):
+1. Install dependencies:
 
-```bash
-bun run init:db
-```
+   ```bash
+   bun install
+   ```
 
-This will create a `local.db` file in your project root.
+2. Initialize the database:
+   ```bash
+   bun run init:db
+   ```
 
 ## Usage
 
-### Starting the Server
-
-Start the EzDB server:
+### Start Server
 
 ```bash
 bun start
 ```
 
-By default, the server listens on `127.0.0.1:3030`. You can configure this via environment variables.
+Starts the server on `127.0.0.1:3030` (default).
 
-### Using the CLI
-
-EzDB comes with a built-in CLI to interact with the server:
+### CLI
 
 ```bash
 bun cli
 ```
 
-Once connected, you can run commands like:
+### Examples
 
-```
-ezdb 127.0.0.1:6379> SET mykey "Hello World" 60
-"OK"
-ezdb 127.0.0.1:6379> GET mykey
-"Hello World"
-```
+Run the client example:
 
-## Supported Commands
-
-EzDB supports a subset of core Redis commands:
-
-- **Strings**
-  - `GET <key>`
-  - `SET <key> <value> [ttl]`
-  - `DEL <key>`
-- **Hashes**
-
-  - `HSET <key> <field> <value> [ttl]`
-  - `HGET <key> <field>`
-  - `HGETALL <key>`
-  - `HKEYS` (Global hash keys)
-  - `HDEL <key> <field>`
-  - `HDELALL <key>` (Delete entire hash)
-
-- **Sets / Lists**
-  - `APPEND <key> <member> [ttl]` (Acts like SADD)
-  - `REMOVE <key> <member>` (Acts like SREM)
-  - `FETCH <key>` (Acts like SMEMBERS)
-  - `LDEL <key>` (Delete entire set/list)
-
-## Configuration
-
-You can configure the server using environment variables (create a `.env` file):
-
-```env
-PORT=6379
-HOST=127.0.0.1
-DB_FILE_NAME=local.db
+```bash
+bun run examples/client.ts
 ```
 
-## detailed Architecture
+Or the Python client:
 
-- **Server**: A TCP server implemented with `node:net` running on Bun.
-- **Persistence**: SQLite database accessed via `drizzle-orm` and `@libsql/client`.
-- **Schema**: Single generalized table (`ezdb`) storing keys, values, types, and members with composite primary keys for flexibility.
+```bash
+python3 examples/client.py
+```
 
-## Development
+## Commands
 
-- **Lint/Check**: `bun run check`
-- **Build**: `bun run build`
-- **Database Generation**: `bun run db:generate`
-- **Database Migration**: `bun run db:migrate`
-- **Test**: `bun test`
+### Keys
 
-## License
+- `SET <key> <value> [ttl]` - Set key to hold the string value.
+- `GET <key>` - Get the value of key.
+- `DEL <key>` - Delete a key.
+- `KEYS` - Find all keys.
+- `COUNT` - Count total number of keys.
 
-Private / Proprietary
+### Hashes
+
+- `HSET <key> <field> <value> [ttl]` - Set field in the hash stored at key to value.
+- `HGET <key> <field>` - Get the value of a hash field.
+- `HDEL <key> <field>` - Delete one or more hash fields.
+- `HDELALL <key>` - Delete the entire hash.
+- `HGETALL <key>` - Get all the fields and values in a hash.
+- `HKEYS` - Get all keys in strings/hashes.
+
+### Lists & Sets
+
+- `APPEND <key> <member> [ttl]` - Add a member to a set/list.
+- `FETCH <key>` - Get all members of a set/list.
+- `REMOVE <key> <member>` - Remove a member from a set/list.
+- `LDEL <key>` - Delete the entire set/list.
+- `LKEYS` - Get all list keys.
+- `LEN <key>` - Get the length of a set/list.
