@@ -6,6 +6,8 @@ import {
   fetchList,
   getHashKeys,
   getKey,
+  getKeys,
+  getListKeys,
   hgetAll,
   removeFromList,
   setKey,
@@ -66,6 +68,7 @@ const commandsHandler = {
 
     return await hgetAll(hkey);
   },
+  KEYS: () => getKeys(),
   HKEYS: () => getHashKeys(),
   FETCH: async (args: string[]) => {
     const [lkey] = args;
@@ -89,6 +92,7 @@ const commandsHandler = {
 
     return !!(await delListKey(lkey));
   },
+  LKEYS: () => getListKeys(),
 };
 
 export const executeCommand = (

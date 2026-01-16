@@ -69,6 +69,30 @@ export const getHashKeys = async () =>
     ),
   );
 
+export const getKeys = async () =>
+  Array.from(
+    new Set(
+      (
+        await db
+          .select({ key: baseTable.key })
+          .from(baseTable)
+          .where(and(notExpired(), eq(baseTable.type, "key")))
+      ).map((i) => i.key),
+    ),
+  );
+
+export const getListKeys = async () =>
+  Array.from(
+    new Set(
+      (
+        await db
+          .select({ key: baseTable.key })
+          .from(baseTable)
+          .where(and(notExpired(), eq(baseTable.type, "set")))
+      ).map((i) => i.key),
+    ),
+  );
+
 export const hgetAll = async (
   key: string,
 ): Promise<{ name: string; value: string }[]> =>
@@ -159,5 +183,6 @@ export const delExpired = async () =>
     await db
       .delete(baseTable)
       .where(lt(baseTable.expiresAt, new Date()))
+      .limit(1000)
       .returning({ key: baseTable.key })
   ).length;
