@@ -14,39 +14,42 @@ import {
   removeFromList,
   setKey,
 } from "./db";
-import { decode, encode, toDate } from "./helper";
+import { checkArgslength, decode, encode, toDate } from "./helper";
 import { loggers } from "./logger";
 
 const commandsHandler = {
   GET: async (args: string[]) => {
     const [key] = args;
-    if (!key) throw new Error();
+    checkArgslength(1, args);
+    if (!key) return;
     const r = await getKey(key);
 
     return r ? decode(r) : false;
   },
   DEL: async (args: string[]) => {
     const [key] = args;
-    if (!key) throw new Error();
+    checkArgslength(1, args);
+    if (!key) return;
 
     return !!(await delKey(key));
   },
   SET: (args: string[]) => {
     const [key, value, ttl] = args;
-
-    if (!key || !value) throw new Error();
+    checkArgslength(2, args);
+    if (!key || !value) return;
     return setKey(key, encode(value), "", toDate(ttl));
   },
   HSET: (args: string[]) => {
     const [hkey, name, value, ttl] = args;
-
-    if (!hkey || !name || !value) throw new Error();
+    checkArgslength(3, args);
+    if (!hkey || !name || !value) return;
 
     return setKey(hkey, encode(value), name, toDate(ttl), "hash");
   },
   HGET: async (args: string[]) => {
     const [hkey, name] = args;
-    if (!hkey || !name) throw new Error();
+    checkArgslength(2, args);
+    if (!hkey || !name) return;
 
     const r = await getKey(hkey, name, "hash");
 
@@ -54,19 +57,22 @@ const commandsHandler = {
   },
   HDEL: async (args: string[]) => {
     const [hkey, name] = args;
-    if (!hkey || !name) throw new Error();
+    checkArgslength(2, args);
+    if (!hkey || !name) return;
 
     return !!(await delHash(hkey, name));
   },
   HDELALL: async (args: string[]) => {
     const [hkey] = args;
-    if (!hkey) throw new Error();
+    checkArgslength(1, args);
+    if (!hkey) return;
 
     return !!(await delHashKey(hkey));
   },
   HGETALL: async (args: string[]) => {
     const [hkey] = args;
-    if (!hkey) throw new Error();
+    checkArgslength(1, args);
+    if (!hkey) return;
 
     return await hgetAll(hkey);
   },
@@ -74,30 +80,35 @@ const commandsHandler = {
   HKEYS: getHashKeys,
   FETCH: async (args: string[]) => {
     const [lkey] = args;
-    if (!lkey) throw new Error();
+    checkArgslength(1, args);
+    if (!lkey) return;
     return await fetchList(lkey);
   },
   APPEND: (args: string[]) => {
     const [lkey, member, ttl] = args;
-    if (!lkey || !member) throw new Error();
+    checkArgslength(2, args);
+    if (!lkey || !member) return;
     return setKey(lkey, undefined, encode(member), toDate(ttl), "set");
   },
   REMOVE: async (args: string[]) => {
     const [lkey, member] = args;
-    if (!lkey || !member) throw new Error();
+    checkArgslength(2, args);
+    if (!lkey || !member) return;
 
     return !!(await removeFromList(lkey, encode(member)));
   },
   LDEL: async (args: string[]) => {
     const [lkey] = args;
-    if (!lkey) throw new Error();
+    checkArgslength(1, args);
+    if (!lkey) return;
 
     return !!(await delListKey(lkey));
   },
   LKEYS: getListKeys,
   LEN: async (args: string[]) => {
     const [lkey] = args;
-    if (!lkey) throw new Error();
+    checkArgslength(1, args);
+    if (!lkey) return;
     return await getListKeysLength(lkey);
   },
   COUNT: getKeysLength,
@@ -109,7 +120,7 @@ export const executeCommand = (
 ) => {
   loggers.core.log(`Recieved ${command}|${args}`);
   const handler = commandsHandler[command];
-  if (!handler) throw new Error();
+  if (!handler) throw new Error("Invalid command");
 
   return handler(args);
 };

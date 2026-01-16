@@ -26,8 +26,7 @@ server.on("connection", (socket) => {
         response += "\r\n";
       }
     } catch (err) {
-      console.error(err);
-      response = `-ERR: ${err}\r\n`;
+      response = `${err}\r\n`;
     }
 
     socket.write(response);
@@ -39,9 +38,12 @@ server.on("connection", (socket) => {
 });
 
 server.listen(Number(PORT), HOST, () => {
-  setInterval(async () => {
-    const deleted = await delExpired();
-    loggers.util.log(`Deleted ${deleted} expired keys`);
-  }, Number(process.env.AUTO_DEL_INTERVAL ?? "60000"));
+  setInterval(
+    async () => {
+      const deleted = await delExpired();
+      loggers.util.log(`Deleted ${deleted} expired keys`);
+    },
+    Number(process.env.AUTO_DEL_INTERVAL ?? "60000"),
+  );
   loggers.server.log(`Server running at ${HOST}:${PORT}`);
 });
