@@ -39,10 +39,9 @@ server.on("connection", (socket) => {
 });
 
 server.listen(Number(PORT), HOST, () => {
-  // Delete expired keys every 5 minutes
   setInterval(async () => {
     const deleted = await delExpired();
     loggers.util.log(`Deleted ${deleted} expired keys`);
-  }, 300_000);
+  }, Number(process.env.AUTO_DEL_INTERVAL ?? "60000"));
   loggers.server.log(`Server running at ${HOST}:${PORT}`);
 });
